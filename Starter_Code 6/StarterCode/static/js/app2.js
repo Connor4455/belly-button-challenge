@@ -1,35 +1,31 @@
-// Display the default plot
+
 function init() {
     d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json").then(function (data) {
       console.log(data);
-        // Create array to hold all names (all ID names)
         let names = data.samples.map(x=>x.id)
-        // Append an option in the dropdown
         names.forEach(function(name) {
             d3.select('#selDataset')
                 .append('option')
                 .text(name)
             });
   
-    // Create arrays for sample_values, OTU ids, and OTU labels        
+       
     let sample_values = data.samples.map(x=> x.sample_values);
     let otu_ids = data.samples.map(x=> x.otu_ids);
     let otu_label = data.samples.map(x=> x.otu_labels);
     
-    // Get the top 10 OTU
+
     let sorted_test = sample_values.sort(function(a, b){return b-a});
     let top_ten = sorted_test.map(x => x.slice(0,10));
     let sorted_ids = otu_ids.sort(function(a, b){return b-a});
     let top_ids = sorted_ids.map(x =>x.slice(0,10));
     let sorted_labels = otu_label.sort(function(a, b){return b-a});
     let top_labels = sorted_labels.map(x =>x.slice(0,10));
-  
-    // Get the first ID to display on page on load
-    let firstID = data.metadata[0]// first id
-    let sampleMetadata1 = d3.select("#sample-metadata").selectAll('h1')
+
+    var firstID = data.metadata[0]// first id
+    var sampleMetadata1 = d3.select("#sample-metadata").selectAll('h1')
     
-    //-------------------------------------------------
-    // Display the first ID's demographic information
+
     let sampleMetadata = sampleMetadata1.data(d3.entries(firstID))
     sampleMetadata.enter()
                   .append('h1')
@@ -39,8 +35,7 @@ function init() {
   
     sampleMetadata.exit().remove()
   
-    // Create Bar Chart
-    // Create trace for bar chart
+
     let trace1 = {
         x : top_ten[0],
         y : top_ids[0].map(x => "OTU" + x),
@@ -61,19 +56,17 @@ function init() {
           }
         }
     };
-    // Create layout
+
     let layout1 = {
         title : '<b>Top 10 OTU</b>',
     };
   
-    // Draw the bar chart
-    let data = [trace1];
+
+    var data = [trace1];
     var config = {responsive:true}
-    Plotly.newPlot('bar', data, layout1, config);
+    Plotly.newPlot('bar', data, layout1,config);
   
-  
-    // Create a bubble chart 
-    // Create the trace for the bubble chart
+
     let trace2 = {
         x : otu_ids[0],
         y : sample_values[0],
@@ -85,7 +78,7 @@ function init() {
         }
     };
   
-    // Create layout
+
     let layout2 = {
         title: '<b>Bubble Chart</b>',
         automargin: true,
@@ -99,17 +92,16 @@ function init() {
                 pad: 4      
     }};
   
-    // Draw the bubble chart
-    let data2 = [trace2];
-    let config = {responsive:true}
+
+    var data2 = [trace2];
+    var config = {responsive:true}
     Plotly.newPlot('bubble',data2,layout2,config);
   
     
-    //Plot the weekly washing frequency in a gauge chart.
-    // Get the first ID's washing frequency
+
     let firstWFreq = firstID.wfreq;
   
-    // Calculations for gauge needle
+
     let firstWFreqDeg = firstWFreq * 20;
     let degrees = 180 - firstWFreqDeg;
     let radius = 0.5;
@@ -117,7 +109,7 @@ function init() {
     let x = radius * Math.cos(degrees * Math.PI / 180);
     let y = radius * Math.sin(degrees * Math.PI / 180);
   
-    // Create path for gauge needle
+
     let path1 = (degrees < 45 || degrees > 135) ? 'M -0.0 -0.025 L 0.0 0.025 L ' : 'M -0.025 -0.0 L 0.025 0.0 L ';
     let mainPath = path1,
      pathX = String(x),
@@ -126,7 +118,6 @@ function init() {
      pathEnd = ' Z';
     let path = mainPath.concat(pathX,space,pathY,pathEnd);
   
-    // Create trace for gauge chart (both the chart and the pointer)
     let dataGauge = [
         {
           type: "scatter",
@@ -167,7 +158,7 @@ function init() {
         }
       ];
   
-    // Create the layout for the gauge chart
+
     let layoutGauge = {
         shapes: [
           {
@@ -192,35 +183,30 @@ function init() {
           showgrid: false,
           range: [-1, 1]
         }};
-      let config = {responsive:true}
-      // Plot the gauge chart
+      var config = {responsive:true}
+
       Plotly.newPlot('gauge', dataGauge,layoutGauge,config);
   });
   };
   
   
-  // Update the plot 
+
   function updatePlotly(id) {
     d3.json("https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json").then(function (data) {
       console.log(data);
-        // Get the sample data
         let test = data.samples.filter(x => x.id === id);
   
-        // Get the top 10 sample values
         let sample_values = test.map(x => x.sample_values).sort(function(a, b){return b-a});
         let top_values = sample_values.map(x => x.slice(0,10));
   
-        // Get the top ten IDs
         let otu_ids = test.map(x=> x.otu_ids).sort(function(a, b){return b-a});
         let top_ids = otu_ids.map(x => x.slice(0,10));
   
-        // Get the top ten labels
         let otu_label = test.map(x=> x.otu_labels).sort(function(a, b){return b-a});
         let top_labels = otu_label.map(x => x.slice(0,10));
   
         let metadataSamples = data.metadata.filter(x => x.id === +id)[0];
   
-        // Get the demographic information
         let sampleMetadata1 = d3.select("#sample-metadata").selectAll('h1')
         let sampleMetadata = sampleMetadata1.data(d3.entries(metadataSamples))
         sampleMetadata.enter()
@@ -228,19 +214,17 @@ function init() {
                       .merge(sampleMetadata)
                       .text(d => `${d.key} : ${d.value}`)
                       .style('font-size','50%')
-  
-        // Get the wash frequency for the current ID            
+          
         let wFreq = metadataSamples.wfreq;
         let wFreqDeg = wFreq * 20;
   
-        // Calculations for gauge pointer
+
         let degrees = 180 - wFreqDeg;
         let radius = 0.5;
         let radians = (degrees * Math.PI) / 180;
         let x = radius * Math.cos(degrees * Math.PI / 180);
         let y = radius * Math.sin(degrees * Math.PI / 180);
   
-        // Create path
         let path1 = (degrees < 45 || degrees > 135) ? 'M -0.0 -0.025 L 0.0 0.025 L ' : 'M -0.025 -0.0 L 0.025 0.0 L ';
         let mainPath = path1,
         pathX = String(x),
@@ -249,7 +233,7 @@ function init() {
         pathEnd = ' Z';
         let path = mainPath.concat(pathX,space,pathY,pathEnd);
   
-        // Create trace
+
         let dataGauge = [
             {
             type: "scatter",
@@ -290,7 +274,6 @@ function init() {
           }
         ];
     
-      // Create the layout
       let layoutGauge = {
           shapes: [
             {
@@ -320,12 +303,9 @@ function init() {
         };
         var config = {responsive:true}
   
-        // Plot the gauge chart
         Plotly.newPlot('gauge', dataGauge,layoutGauge,config);
   
-        
-        // Create Bar Chart
-        // Create trace for bar chart
+
         let trace = {
             x : top_values[0],
             y : top_ids[0].map(x => "OTU" + x),
@@ -347,19 +327,16 @@ function init() {
               }
         };
   
-        // Create the layout
+
         let layout1 = {
             title: "<b>Top 10 OTU</b>"
         };
-        let data1 = [trace];
-        let config = {responsive:true}
+        var data1 = [trace];
+        var config = {responsive:true}
   
-        // Plot the bar chart
         Plotly.newPlot('bar', data1,layout1,config);
   
-  
-        // Create a bubble chart 
-        // Create the trace for the bubble chart
+
         let trace2 = {
             x : test.map(x=> x.otu_ids)[0],
             y : test.map(x => x.sample_values)[0],
@@ -371,7 +348,6 @@ function init() {
             }   
         };
   
-        // Create the layout
         let layout2 = {
             title: '<b>Bubble Chart</b>',
             automargin: true,
@@ -385,16 +361,14 @@ function init() {
                 pad: 4
               }
         };
-  
-        // Create the bubble chart
-        let data2 = [trace2];
-        let config = {responsive:true}
+
+        var data2 = [trace2];
+        var config = {responsive:true}
         Plotly.newPlot('bubble', data2,layout2,config)
     });
   };
   
   
-  // Call updatePlotly
   function optionChanged(id) {
     updatePlotly(id);
   };
